@@ -91,7 +91,13 @@ public class MainFrame extends JFrame {
 			} else if (cmd.equals("Save")) {
 				codeArea.setText("Save");
 			} else if (cmd.equals("Run")) {
-				resultLabel.setText("Hello, result");
+				String code = codeArea.getText();
+				String param = inputArea.getText();
+				try {
+					resultLabel.setText(RemoteHelper.getInstance().getExecuteService().execute(code, param));
+				} catch (RemoteException e1) {
+					e1.printStackTrace();
+				}
 			}
 		}
 	}
