@@ -8,16 +8,24 @@ import service.UserService;
 
 public class ExecuteServiceImpl implements ExecuteService {
 	
-	public static int[] array = new int[100];
+	public int[] array = new int[100];
 	
-	public static String input;
+	public String input;
 	
-	public static String result = "";
+	public String result;
+	
+	public void init(String param) {
+		for (int i = 0; i < array.length; i++)
+			array[i] = 0;
+		input = param;
+		result = "";
+	}
 
-	private static void compile(String code, int ptr) {
-		int i = 0;
-		while (i < code.length()) {
-			switch(code.charAt(i)) {
+	private void compile(String code, int ptr) {
+		// BF代码运行到的位置
+		int position = 0;
+		while (position < code.length()) {
+			switch(code.charAt(position)) {
 			case '>':   
 				ptr++; break;
 			case '<':   
@@ -35,7 +43,7 @@ public class ExecuteServiceImpl implements ExecuteService {
 			case '[':
 				// 寻找 “[” 对应的 “]”
 				int temp = 0;
-				for (int j = i + 1; j < code.length(); j++) {
+				for (int j = position + 1; j < code.length(); j++) {
 					if(code.charAt(j) == '[') {
 						temp ++;
 						continue;
@@ -46,8 +54,8 @@ public class ExecuteServiceImpl implements ExecuteService {
 							continue;
 						}
 						while(array[ptr] != 0)
-							compile(code.substring(i + 1, j), ptr);
-						i = j;
+							compile(code.substring(position + 1, j), ptr);
+						position = j;
 						break;
 					}
 				}
@@ -55,13 +63,13 @@ public class ExecuteServiceImpl implements ExecuteService {
 			default:  
 				break;
 			}
-			i++;
+			position++;
 		}
 	}
 	
 	@Override
 	public String execute(String code, String param) throws RemoteException {
-		input = param;
+		init(param);
 		compile(code, 0);
 		return result;
 	}

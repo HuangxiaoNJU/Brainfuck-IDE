@@ -66,6 +66,7 @@ public class MainFrame extends JFrame {
 		
 		// ÏÔÊ¾½á¹û
 		resultLabel = new JLabel();
+		resultLabel.setHorizontalAlignment(JLabel.CENTER);
 		resultLabel.setText("result");
 		pane = new JScrollPane(resultLabel);
 		pane.setBounds(250, 300, 250, 100);
