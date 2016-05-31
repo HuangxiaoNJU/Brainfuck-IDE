@@ -1,7 +1,5 @@
 package ui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,20 +10,25 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import rmi.RemoteHelper;
 
 
 public class MainFrame extends JFrame {
-	private JTextArea textArea;
+	private JTextArea codeArea;
+	private JTextArea inputArea;
 	private JLabel resultLabel;
 
 	public MainFrame() {
 		// 创建窗体
 		JFrame frame = new JFrame("BF Client");
-		frame.setLayout(new BorderLayout());
-
+		frame.setLayout(null);
+		// 滚动条
+		JScrollPane pane;
+		
+		// 菜单
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);
@@ -37,26 +40,42 @@ public class MainFrame extends JFrame {
 		fileMenu.add(saveMenuItem);
 		JMenuItem runMenuItem = new JMenuItem("Run");
 		fileMenu.add(runMenuItem);
-		frame.setJMenuBar(menuBar);
-
+		menuBar.setBounds(0, 0, 500, 20);
+		frame.add(menuBar);
+		
+		// 安装菜单监听器
 		newMenuItem.addActionListener(new MenuItemActionListener());
 		openMenuItem.addActionListener(new MenuItemActionListener());
 		saveMenuItem.addActionListener(new SaveActionListener());
 		runMenuItem.addActionListener(new MenuItemActionListener());
 
-		textArea = new JTextArea();
-		textArea.setMargin(new Insets(10, 10, 10, 10));
-		textArea.setBackground(Color.LIGHT_GRAY);
-		frame.add(textArea, BorderLayout.CENTER);
-
+		// 代码文本区
+		codeArea = new JTextArea();
+		codeArea.setMargin(new Insets(10, 10, 10, 10));
+//		textArea.setBackground(Color.LIGHT_GRAY);
+		pane = new JScrollPane(codeArea);
+		pane.setBounds(0, 20, 500, 280);
+		frame.add(pane);
+		
+		// 输入文本区
+		inputArea = new JTextArea("Input");
+		inputArea.setMargin(new Insets(10, 10, 10, 10));
+		pane = new JScrollPane(inputArea);
+		pane.setBounds(0, 300, 250, 100);
+		frame.add(pane);
+		
 		// 显示结果
 		resultLabel = new JLabel();
 		resultLabel.setText("result");
-		frame.add(resultLabel, BorderLayout.SOUTH);
+		pane = new JScrollPane(resultLabel);
+		pane.setBounds(250, 300, 250, 100);
+		frame.add(pane);
 
+		// 窗体属性设置
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(500, 400);
+		frame.setSize(500, 420);
 		frame.setLocation(400, 200);
+		frame.setResizable(false);
 		frame.setVisible(true);
 	}
 
@@ -68,9 +87,9 @@ public class MainFrame extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			String cmd = e.getActionCommand();
 			if (cmd.equals("Open")) {
-				textArea.setText("Open");
+				codeArea.setText("Open");
 			} else if (cmd.equals("Save")) {
-				textArea.setText("Save");
+				codeArea.setText("Save");
 			} else if (cmd.equals("Run")) {
 				resultLabel.setText("Hello, result");
 			}
@@ -81,7 +100,7 @@ public class MainFrame extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String code = textArea.getText();
+			String code = codeArea.getText();
 			try {
 				RemoteHelper.getInstance().getIOService().writeFile(code, "admin", "code");
 			} catch (RemoteException e1) {
