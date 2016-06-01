@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -20,6 +21,8 @@ public class MainFrame extends JFrame {
 	private JTextArea codeArea;
 	private JTextArea inputArea;
 	private JLabel resultLabel;
+	private JButton loginButton;
+	private JButton logoutButton;
 
 	public MainFrame() {
 		// 创建窗体
@@ -30,6 +33,7 @@ public class MainFrame extends JFrame {
 		
 		// 菜单
 		JMenuBar menuBar = new JMenuBar();
+		
 		JMenu fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);
 		JMenuItem newMenuItem = new JMenuItem("New");
@@ -38,16 +42,37 @@ public class MainFrame extends JFrame {
 		fileMenu.add(openMenuItem);
 		JMenuItem saveMenuItem = new JMenuItem("Save");
 		fileMenu.add(saveMenuItem);
-		JMenuItem runMenuItem = new JMenuItem("Run");
-		fileMenu.add(runMenuItem);
-		menuBar.setBounds(0, 0, 500, 20);
+		JMenuItem exitMenuItem = new JMenuItem("Exit");
+		fileMenu.add(exitMenuItem);
+		
+		JMenu runMenu = new JMenu("Run");
+		menuBar.add(runMenu);
+		JMenuItem executeMenuItem = new JMenuItem("Execute");
+		runMenu.add(executeMenuItem);
+		
+		menuBar.setBounds(0, 0, 420, 20);
 		frame.add(menuBar);
 		
 		// 安装菜单监听器
 		newMenuItem.addActionListener(new MenuItemActionListener());
 		openMenuItem.addActionListener(new MenuItemActionListener());
 		saveMenuItem.addActionListener(new SaveActionListener());
-		runMenuItem.addActionListener(new MenuItemActionListener());
+		exitMenuItem.addActionListener(new MenuItemActionListener());
+		executeMenuItem.addActionListener(new MenuItemActionListener());
+		
+		// 登录按钮
+		loginButton = new JButton("Log in");
+		loginButton.setBounds(420, 0, 80, 20);
+		frame.add(loginButton);
+		// 登出按钮
+		logoutButton = new JButton("Log out");
+		logoutButton.setBounds(420, 0, 80, 20);
+		frame.add(logoutButton);
+		loginButton.setVisible(true);
+		logoutButton.setVisible(false);
+		
+		loginButton.addActionListener(new LoginActionLisener());
+		logoutButton.addActionListener(new LogoutActionLisener());
 
 		// 代码文本区
 		codeArea = new JTextArea();
@@ -59,7 +84,7 @@ public class MainFrame extends JFrame {
 		
 		// 输入文本区
 		inputArea = new JTextArea("Input");
-		inputArea.setMargin(new Insets(10, 10, 10, 10));
+		inputArea.setMargin(new Insets(30, 20, 0, 0));
 		pane = new JScrollPane(inputArea);
 		pane.setBounds(0, 300, 250, 100);
 		frame.add(pane);
@@ -91,7 +116,7 @@ public class MainFrame extends JFrame {
 				codeArea.setText("Open");
 			} else if (cmd.equals("Save")) {
 				codeArea.setText("Save");
-			} else if (cmd.equals("Run")) {
+			} else if (cmd.equals("Execute")) {
 				String code = codeArea.getText();
 				String param = inputArea.getText();
 				try {
@@ -114,6 +139,24 @@ public class MainFrame extends JFrame {
 				e1.printStackTrace();
 			}
 		}
+	}
+	
+	class LoginActionLisener implements ActionListener {
 
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			logoutButton.setVisible(true);
+			loginButton.setVisible(false);
+			new LoginFrame();
+		}
+	}
+	
+	class LogoutActionLisener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			loginButton.setVisible(true);
+			logoutButton.setVisible(false);
+		}
 	}
 }
