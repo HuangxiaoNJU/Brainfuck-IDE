@@ -44,6 +44,12 @@ public class DataRemoteObject extends UnicastRemoteObject implements ExecuteServ
 	}
 
 	@Override
+	public boolean signup(String username, String password) throws RemoteException {
+		// TODO Auto-generated method stub
+		return userService.signup(username, password);
+	}
+	
+	@Override
 	public boolean login(String username, String password) throws RemoteException {
 		// TODO Auto-generated method stub
 		return userService.login(username, password);
@@ -60,5 +66,6 @@ public class DataRemoteObject extends UnicastRemoteObject implements ExecuteServ
 		// TODO Auto-generated method stub
 		return executeService.execute(code, param);
 	}
+
 
 }

@@ -18,6 +18,8 @@ import rmi.RemoteHelper;
 
 
 public class MainFrame extends JFrame {
+	
+	private LoginFrame loginFrame;
 	private JTextArea codeArea;
 	private JTextArea inputArea;
 	private JLabel resultLabel;
@@ -28,6 +30,7 @@ public class MainFrame extends JFrame {
 		// 创建窗体
 		JFrame frame = new JFrame("BF Client");
 		frame.setLayout(null);
+		
 		// 滚动条
 		JScrollPane pane;
 		
@@ -84,7 +87,7 @@ public class MainFrame extends JFrame {
 		
 		// 输入文本区
 		inputArea = new JTextArea("Input");
-		inputArea.setMargin(new Insets(30, 20, 0, 0));
+		inputArea.setMargin(new Insets(30, 30, 0, 0));
 		pane = new JScrollPane(inputArea);
 		pane.setBounds(0, 300, 250, 100);
 		frame.add(pane);
@@ -103,12 +106,13 @@ public class MainFrame extends JFrame {
 		frame.setLocation(400, 200);
 		frame.setResizable(false);
 		frame.setVisible(true);
+		frame.setFocusable(false);
+		// 登录界面
+		loginFrame = new LoginFrame();
 	}
 
 	class MenuItemActionListener implements ActionListener {
-		/**
-		 * 
-		 */
+		
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String cmd = e.getActionCommand();
@@ -147,7 +151,7 @@ public class MainFrame extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			logoutButton.setVisible(true);
 			loginButton.setVisible(false);
-			new LoginFrame();
+			loginFrame.frame.setVisible(true);
 		}
 	}
 	

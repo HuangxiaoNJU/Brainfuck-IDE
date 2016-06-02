@@ -4,17 +4,16 @@ package serviceImpl;
 import java.rmi.RemoteException;
 
 import service.ExecuteService;
-import service.UserService;
 
 public class ExecuteServiceImpl implements ExecuteService {
 	
-	public int[] array = new int[100];
+	private int[] array = new int[100];
 	
-	public String input;
+	private String input;
 	
-	public String result;
+	private String result;
 	
-	public void init(String param) {
+	private void init(String param) {
 		for (int i = 0; i < array.length; i++)
 			array[i] = 0;
 		input = param;
