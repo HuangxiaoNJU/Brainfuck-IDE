@@ -13,6 +13,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 
 import rmi.RemoteHelper;
 
@@ -23,8 +24,9 @@ public class MainFrame extends JFrame {
 	private JTextArea codeArea;
 	private JTextArea inputArea;
 	private JLabel resultLabel;
-	private JButton loginButton;
-	private JButton logoutButton;
+	public JButton loginButton;
+	public JButton logoutButton;
+	public JLabel logInfoLabel;
 
 	public MainFrame() {
 		// 创建窗体
@@ -32,7 +34,7 @@ public class MainFrame extends JFrame {
 		frame.setLayout(null);
 		
 		// 滚动条
-		JScrollPane pane;
+		JScrollPane scroller;
 		
 		// 菜单
 		JMenuBar menuBar = new JMenuBar();
@@ -53,7 +55,7 @@ public class MainFrame extends JFrame {
 		JMenuItem executeMenuItem = new JMenuItem("Execute");
 		runMenu.add(executeMenuItem);
 		
-		menuBar.setBounds(0, 0, 420, 20);
+		menuBar.setBounds(0, 0, 320, 20);
 		frame.add(menuBar);
 		
 		// 安装菜单监听器
@@ -76,29 +78,38 @@ public class MainFrame extends JFrame {
 		
 		loginButton.addActionListener(new LoginActionLisener());
 		logoutButton.addActionListener(new LogoutActionLisener());
+		
+		// 登录信息
+		logInfoLabel = new JLabel();
+		logInfoLabel.setHorizontalAlignment(JLabel.CENTER);
+		logInfoLabel.setText("Please log in: ");
+		logInfoLabel.setBounds(320, 0, 100, 20);
+		frame.add(logInfoLabel);
 
 		// 代码文本区
 		codeArea = new JTextArea();
 		codeArea.setMargin(new Insets(10, 10, 10, 10));
 //		textArea.setBackground(Color.LIGHT_GRAY);
-		pane = new JScrollPane(codeArea);
-		pane.setBounds(0, 20, 500, 280);
-		frame.add(pane);
+		scroller = new JScrollPane(codeArea);
+		scroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scroller.setBounds(0, 20, 500, 280);
+		frame.add(scroller);
 		
 		// 输入文本区
 		inputArea = new JTextArea("Input");
-		inputArea.setMargin(new Insets(30, 30, 0, 0));
-		pane = new JScrollPane(inputArea);
-		pane.setBounds(0, 300, 250, 100);
-		frame.add(pane);
+		inputArea.setMargin(new Insets(20, 20, 0, 0));
+		scroller = new JScrollPane(inputArea);
+		scroller.setBounds(0, 300, 250, 100);
+		frame.add(scroller);
 		
 		// 显示结果
 		resultLabel = new JLabel();
 		resultLabel.setHorizontalAlignment(JLabel.CENTER);
 		resultLabel.setText("result");
-		pane = new JScrollPane(resultLabel);
-		pane.setBounds(250, 300, 250, 100);
-		frame.add(pane);
+		scroller = new JScrollPane(resultLabel);
+		scroller.setBounds(250, 300, 250, 100);
+		frame.add(scroller);
 
 		// 窗体属性设置
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -107,8 +118,9 @@ public class MainFrame extends JFrame {
 		frame.setResizable(false);
 		frame.setVisible(true);
 		frame.setFocusable(false);
+		
 		// 登录界面
-		loginFrame = new LoginFrame();
+		loginFrame = new LoginFrame(this);
 	}
 
 	class MenuItemActionListener implements ActionListener {
@@ -149,8 +161,6 @@ public class MainFrame extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			logoutButton.setVisible(true);
-			loginButton.setVisible(false);
 			loginFrame.frame.setVisible(true);
 		}
 	}
@@ -159,8 +169,9 @@ public class MainFrame extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			loginButton.setVisible(true);
+			logInfoLabel.setText("Please log in:");
 			logoutButton.setVisible(false);
+			loginButton.setVisible(true);
 		}
 	}
 }

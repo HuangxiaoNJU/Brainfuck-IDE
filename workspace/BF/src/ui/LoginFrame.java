@@ -13,12 +13,16 @@ import javax.swing.JTextField;
 import rmi.RemoteHelper;
 
 public class LoginFrame extends JFrame {
-	
+		
 	public JFrame frame;
+	private MainFrame mainFrame;
 	private JTextField userIdField;
 	private JPasswordField passwordField;
+	private JLabel infoLabel;
 
-	public LoginFrame() {
+	public LoginFrame(MainFrame mainFrame) {
+		this.mainFrame = mainFrame;
+		
 		frame = new JFrame("Welcome!");
 		frame.setLayout(null);
 		
@@ -30,24 +34,31 @@ public class LoginFrame extends JFrame {
 		frame.add(userId);
 		frame.add(password);
 		
-		// 用户名、密码单行文本框
+		// 用户名、密码文本框
 		userIdField = new JTextField();
 		passwordField = new JPasswordField();
-		userIdField.setBounds(110, 30, 120, 20);
-		passwordField.setBounds(110, 80, 120, 20);
+		userIdField.setBounds(100, 30, 130, 20);
+		passwordField.setBounds(100, 80, 130, 20);
 		frame.add(userIdField);
 		frame.add(passwordField);
 
 		// 登录、注册按钮
 		JButton login = new JButton("log in");
 		JButton signup = new JButton("sign up");
-		login.setBounds(30, 130, 80, 20);
-		signup.setBounds(140, 130, 80, 20);
+		login.setBounds(30, 140, 80, 20);
+		signup.setBounds(140, 140, 80, 20);
 		frame.add(login);
 		frame.add(signup);
 		// 安装按钮监听器
 		login.addActionListener(new loginListener());
 		signup.addActionListener(new signupListener());
+		
+		// 消息提示标签
+		infoLabel = new JLabel();
+		infoLabel.setHorizontalAlignment(JLabel.CENTER);
+		infoLabel.setBounds(25, 110, 200, 20);
+		infoLabel.setVisible(false);
+		frame.add(infoLabel);
 		
 		// 窗体属性设置
 //		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -68,6 +79,14 @@ public class LoginFrame extends JFrame {
 				if(RemoteHelper.getInstance().getUserService().login(username, password)) {
 					frame.setVisible(false);
 					// TODO 登录成功
+					mainFrame.logInfoLabel.setText("Hi! " + username);
+					mainFrame.loginButton.setVisible(false);
+					mainFrame.logoutButton.setVisible(true);
+				}
+				// 错误消息提示
+				else {
+					infoLabel.setText("Login failed!");
+					infoLabel.setVisible(true);
 				}
 			} catch (RemoteException e1) {
 				e1.printStackTrace();
@@ -83,10 +102,15 @@ public class LoginFrame extends JFrame {
 			String password = new String(passwordField.getPassword());
 			try {
 				if(RemoteHelper.getInstance().getUserService().signup(username, password)) {
-					frame.setVisible(false);
-					// TODO 注册成功
+					infoLabel.setText("signup succeed!");
+					infoLabel.setVisible(true);
 				}
-			} catch (RemoteException e1){
+				// 错误消息提示
+				else {
+					infoLabel.setText("User name already exists!");
+					infoLabel.setVisible(true);
+				}
+			} catch (RemoteException e1) {
 				e1.printStackTrace();
 			}
 		}
