@@ -26,6 +26,12 @@ public class DataRemoteObject extends UnicastRemoteObject implements ExecuteServ
 	}
 
 	@Override
+	public boolean createFile(String userId, String fileName) throws RemoteException {
+		// TODO Auto-generated method stub
+		return iOService.createFile(userId, fileName);
+	}
+	
+	@Override
 	public boolean writeFile(String file, String userId, String fileName) throws RemoteException{
 		// TODO Auto-generated method stub
 		return iOService.writeFile(file, userId, fileName);
@@ -38,7 +44,7 @@ public class DataRemoteObject extends UnicastRemoteObject implements ExecuteServ
 	}
 
 	@Override
-	public String readFileList(String userId) throws RemoteException{
+	public String[] readFileList(String userId) throws RemoteException{
 		// TODO Auto-generated method stub
 		return iOService.readFileList(userId);
 	}
