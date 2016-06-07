@@ -1,5 +1,7 @@
 package ui;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
@@ -8,6 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
@@ -19,12 +22,11 @@ public class LoginDialog extends JDialog {
 	private MainFrame mainFrame;
 	private JTextField userIdField;
 	private JPasswordField passwordField;
-	private JLabel infoLabel;
-
+	
 	public LoginDialog(MainFrame mainFrame) {
+		super(mainFrame, "Welcome", true);
 		
 		this.mainFrame = mainFrame;
-		
 		this.loginDialog = this;
 		
 		// 提示标签
@@ -46,30 +48,26 @@ public class LoginDialog extends JDialog {
 		// 登录、注册按钮
 		JButton login = new JButton("log in");
 		JButton signup = new JButton("sign up");
-		login.setBounds(30, 140, 80, 20);
-		signup.setBounds(140, 140, 80, 20);
+		login.setBounds(30, 130, 80, 20);
+		signup.setBounds(140, 130, 80, 20);
 		loginDialog.add(login);
 		loginDialog.add(signup);
 		// 安装按钮监听器
 		login.addActionListener(new loginListener());
 		signup.addActionListener(new signupListener());
 		
-		// 消息提示标签
-		infoLabel = new JLabel();
-		infoLabel.setHorizontalAlignment(JLabel.CENTER);
-		infoLabel.setBounds(25, 110, 200, 20);
-		infoLabel.setVisible(false);
-		loginDialog.add(infoLabel);
-
 		// 对话框属性设置
-		loginDialog.setTitle("Welcome!");
-		loginDialog.setLayout(null);
 		loginDialog.setSize(250, 200);
-		loginDialog.setLocation(520, 300);
-		loginDialog.setAlwaysOnTop(true);
+		// 居中显示
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Dimension screen = toolkit.getScreenSize();
+		int x = (screen.width - this.getWidth()) >> 1;
+		int y = ((screen.height - this.getHeight()) >> 1) - 20;
+		loginDialog.setLocation(x, y);
+		
+		loginDialog.setLayout(null);
 		loginDialog.setResizable(false);
 		loginDialog.setVisible(true);
-		loginDialog.setModal(true);
 	}
 	
 	/**
@@ -82,9 +80,10 @@ public class LoginDialog extends JDialog {
 			String username = userIdField.getText();
 			String password = new String(passwordField.getPassword());
 			try {
-				if(RemoteHelper.getInstance().getUserService().login(username, password)) {
+				String info = RemoteHelper.getInstance().getUserService().login(username, password);
+				// 登录成功
+				if(info.equals("success")) {
 					loginDialog.dispose();
-					// TODO 登录成功
 					mainFrame.fileName = null;
 					mainFrame.username = username;
 					mainFrame.codeArea.setText("");
@@ -93,11 +92,14 @@ public class LoginDialog extends JDialog {
 					mainFrame.loginButton.setVisible(false);
 					mainFrame.logoutButton.setVisible(true);
 					mainFrame.newMenuItem.setEnabled(true);
+					
+					JOptionPane.showMessageDialog(null, "Log in succeed!");
 				}
-				// 错误消息提示
+				// 登录失败，提示错误信息
 				else {
-					infoLabel.setText("Login failed!");
-					infoLabel.setVisible(true);
+					userIdField.setText("");
+					passwordField.setText("");
+					JOptionPane.showMessageDialog(null, info, "Error", JOptionPane.ERROR_MESSAGE);
 				}
 			} catch (RemoteException e1) {
 				e1.printStackTrace();
@@ -114,14 +116,16 @@ public class LoginDialog extends JDialog {
 			String username = userIdField.getText();
 			String password = new String(passwordField.getPassword());
 			try {
-				if(RemoteHelper.getInstance().getUserService().signup(username, password)) {
-					infoLabel.setText("signup succeed!");
-					infoLabel.setVisible(true);
+				String info = RemoteHelper.getInstance().getUserService().signup(username, password);
+				// 注册成功
+				if(info.equals("success")) {
+					JOptionPane.showMessageDialog(null, "Sign up succeed!");
 				}
-				// 错误消息提示
+				// 注册失败，提示错误信息
 				else {
-					infoLabel.setText("User name already exists!");
-					infoLabel.setVisible(true);
+					userIdField.setText("");
+					passwordField.setText("");
+					JOptionPane.showMessageDialog(null, info, "Error", JOptionPane.ERROR_MESSAGE);
 				}
 			} catch (RemoteException e1) {
 				e1.printStackTrace();

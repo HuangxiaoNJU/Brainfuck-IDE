@@ -1,6 +1,8 @@
 package ui;
 
+import java.awt.Dimension;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -18,9 +20,11 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.filechooser.FileFilter;
 
 import rmi.RemoteHelper;
 
@@ -177,9 +181,16 @@ public class MainFrame extends JFrame {
 		mainFrame.add(scroller);
 
 		// 窗体属性设置
+		mainFrame.setSize(500, 420);
+		// 居中显示
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Dimension screen = toolkit.getScreenSize();
+		int x = (screen.width - this.getWidth()) >> 1;
+		int y = ((screen.height - this.getHeight()) >> 1) - 20;
+		mainFrame.setLocation(x, y);
+		
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setSize(500, 420);
-		mainFrame.setLocation(400, 200);
 		mainFrame.setResizable(false);
 		mainFrame.setVisible(true);
 		mainFrame.setFocusable(false);
@@ -195,7 +206,23 @@ public class MainFrame extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			new NewFileDialog(mainFrame);
+			String newFile = JOptionPane.showInputDialog("Please name your new file:");
+			if(newFile != null) {
+				try {
+					if(RemoteHelper.getInstance().getIOService().createFile(mainFrame.username, newFile)) {
+						fileInfoLabel.setText(newFile);
+						fileName = newFile;
+						codeArea.setText("");
+						saveMenuItem.setEnabled(true);
+						JOptionPane.showMessageDialog(null, "New succeed!");
+					}
+					else {
+						JOptionPane.showMessageDialog(null, newFile + " already exists!", "Error", JOptionPane.WARNING_MESSAGE);
+					}
+				} catch (RemoteException e1) {
+					e1.printStackTrace();
+				}
+			}
 		}
 		
 	}
@@ -230,35 +257,53 @@ public class MainFrame extends JFrame {
 			// 未登录，则打开本地文件
 			if (username == null) {
 				JFileChooser jfc = new JFileChooser();
+				// 文件过滤
+				jfc.setFileFilter(new FileFilter() {
+					@Override
+					public boolean accept(File f) {
+						if(f.getName().endsWith(".rtf") || f.getName().endsWith(".txt") || f.isDirectory())
+							return true;
+						return false;
+					}
+					@Override
+					public String getDescription() {
+						return ".rtf .txt";
+					}
+				});
+				// 选择类型错误 TODO
 				jfc.showDialog(new JLabel(), "Choose");
 				jfc.setMultiSelectionEnabled(false);
 				File file = jfc.getSelectedFile();
-				saveMenuItem.setEnabled(true);
-				fileName = file.getAbsolutePath();
-				fileInfoLabel.setText(file.getName());
-				codeArea.setText("");
-				try {
-					BufferedReader bf = new BufferedReader(new FileReader(file));
-					String str = bf.readLine();
-					while (str != null) {
-						codeArea.append(str);
-						str = bf.readLine();
+				if(file != null && file.getName().endsWith(".rtf")) {
+					saveMenuItem.setEnabled(true);
+					fileName = file.getAbsolutePath();
+					fileInfoLabel.setText(file.getName());
+					codeArea.setText("");
+					try {
+						BufferedReader bf = new BufferedReader(new FileReader(file));
+						String str = bf.readLine();
+						while (str != null) {
+							codeArea.append(str);
+							str = bf.readLine();
+						}
+						bf.close();
+					} catch (FileNotFoundException e1) {
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						e1.printStackTrace();
 					}
-					bf.close();
-				} catch (FileNotFoundException e1) {
-					e1.printStackTrace();
-				} catch (IOException e1) {
-					e1.printStackTrace();
 				}
 			}
 			// 已登录，则打开该用户已创建的文件
 			else {
 				try {
+					// 若用户还未创建文件，弹出消息框
 					if(RemoteHelper.getInstance().getIOService().readFileList(username) == null) {
-						// TODO 消息提示：用户还未创建文件
+						JOptionPane.showMessageDialog(null, "You haven't created any file!", "Warning", JOptionPane.WARNING_MESSAGE);
 					}
-					else
+					else {
 						new FileListDialog(mainFrame);
+					}
 				} catch (RemoteException e1) {
 					e1.printStackTrace();
 				}
@@ -303,7 +348,9 @@ public class MainFrame extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO
+			// TODO 服务器
+			fileName = null;
+			fileInfoLabel.setText("No file");
 		}
 		
 	}
@@ -326,6 +373,7 @@ public class MainFrame extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			// TODO 服务器
 			username = null;
 			fileName = null;
 			codeArea.setText("");

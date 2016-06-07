@@ -20,6 +20,7 @@ public class FileListDialog extends JDialog {
 	private JList<String> fileList;
 	
 	public FileListDialog(MainFrame mainFrame) {
+		super(mainFrame, "Open", true);
 		
 		this.mainFrame = mainFrame;
 		this.fileListDialog = this;
@@ -52,13 +53,11 @@ public class FileListDialog extends JDialog {
 		fileListDialog.add(selectButton);
 		
 		// 对话框属性设置
-		fileListDialog.setTitle("Open");
 		fileListDialog.setLayout(null);
 		fileListDialog.setSize(250, 250);
 		fileListDialog.setLocation(520, 300);
 		fileListDialog.setResizable(false);
 		fileListDialog.setAlwaysOnTop(true);
-		fileListDialog.setModal(true);
 		fileListDialog.setVisible(true);
 	}
 	
