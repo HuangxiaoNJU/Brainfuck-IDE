@@ -26,34 +26,34 @@ public class NewFileDialog extends JDialog {
 		this.mainFrame = mainFrame;
 		this.newFileDialog = this;
 		
-		// ÌáÊ¾ÐÅÏ¢
+		// ï¿½ï¿½Ê¾ï¿½ï¿½Ï¢
 		JLabel promptLabel = new JLabel("Please name the file:");
 		promptLabel.setHorizontalAlignment(JLabel.CENTER);
 		promptLabel.setBounds(20, 20, 200, 30);
 		promptLabel.setVisible(true);
 		newFileDialog.add(promptLabel);
 		
-		// ÊäÈëÎÄ±¾¿ò
+		// ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½ï¿½
 		inputField = new JTextField();
 		inputField.setBounds(50, 50, 150, 30);
 		inputField.setVisible(true);
 		newFileDialog.add(inputField);
 		
-		// ´íÎóÌáÊ¾ÐÅÏ¢
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ï¢
 		errorInfoLabel = new JLabel("File already exists!");
 		errorInfoLabel.setHorizontalAlignment(JLabel.CENTER);
 		errorInfoLabel.setBounds(0, 85, 250, 20);
 		errorInfoLabel.setVisible(false);
 		newFileDialog.add(errorInfoLabel);
 		
-		// È·ÈÏ°´Å¥
+		// È·ï¿½Ï°ï¿½Å¥
 		JButton confirmButton = new JButton("confirm");
 		confirmButton.setBounds(70, 110, 100, 30);
 		confirmButton.setVisible(true);
 		confirmButton.addActionListener(new confirmActionListener());
 		newFileDialog.add(confirmButton);
 
-		// ¶Ô»°¿òÊôÐÔÉèÖÃ
+		// ï¿½Ô»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		newFileDialog.setTitle("New");
 		newFileDialog.setLayout(null);
 		newFileDialog.setSize(250, 180);
@@ -65,7 +65,7 @@ public class NewFileDialog extends JDialog {
 	}
 	
 	/**
-	 * È·ÈÏ°´Å¥¼àÌýÆ÷
+	 * È·ï¿½Ï°ï¿½Å¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	class confirmActionListener implements ActionListener {
 
@@ -73,7 +73,7 @@ public class NewFileDialog extends JDialog {
 		public void actionPerformed(ActionEvent e) {
 			String fileName = inputField.getText();
 			try {
-				// ÐÂ½¨ÎÄ¼þ³É¹¦
+				// ï¿½Â½ï¿½ï¿½Ä¼ï¿½ï¿½É¹ï¿½
 				if(RemoteHelper.getInstance().getIOService().createFile(mainFrame.username, fileName)) {
 					mainFrame.fileInfoLabel.setText(fileName);
 					mainFrame.fileName = fileName;

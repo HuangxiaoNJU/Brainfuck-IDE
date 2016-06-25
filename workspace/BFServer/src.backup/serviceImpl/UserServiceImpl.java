@@ -13,18 +13,18 @@ import service.UserService;
 public class UserServiceImpl implements UserService{
 	
 	/**
-	 * passwordsFileÓÃÓÚ´æ´¢ËùÓÐÓÃ»§µÄÓÃ»§ÃûºÍÃÜÂë
+	 * passwordsFileï¿½ï¿½ï¿½Ú´æ´¢ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	private static File passwordsFile;
 	
 	/**
-	 * ÓÃ»§ÎÄ¼þÄ¿Â¼
+	 * ï¿½Ã»ï¿½ï¿½Ä¼ï¿½Ä¿Â¼
 	 */
 	private static File usersDirectory;
 	
 	/**
-	 * ¹¹Ôì·½·¨
-	 * file³õÊ¼»¯
+	 * ï¿½ï¿½ï¿½ì·½ï¿½ï¿½
+	 * fileï¿½ï¿½Ê¼ï¿½ï¿½
 	 */
 	public UserServiceImpl() {
 		passwordsFile = new File("admin_password");
@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService{
 	}
 	
 	/**
-	 * ¼ì²âÓÃ»§ÃûÊÇ·ñÒÑ´æÔÚ£¬Èô´æÔÚ£¬·µ»Øtrue£¬Èô²»´æÔÚ£¬·µ»Øfalse
+	 * ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ñ´ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½trueï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½false
 	 */
 	private boolean isUsernameExist(String username) {
 		try {
@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService{
 	}
 	
 	/**
-	 * ¼ì²âµÇÂ¼ÊÇ·ñ³É¹¦
+	 * ï¿½ï¿½ï¿½ï¿½Â¼ï¿½Ç·ï¿½É¹ï¿½
 	 */
 	private String LoginCheckInfo(String username, String password) {
 		try {
@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService{
 	
 	@Override
 	public String signup(String username, String password) throws RemoteException {
-		// ÓÃ»§Ãû¡¢ÃÜÂë¿Õ¸ñ¼ì²é
+		// ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¸ï¿½ï¿½ï¿½
 		for (int i = 0; i < username.length(); i++) {
 			if(username.charAt(i) == ' ')
 				return "User name cannot contain spaces!";

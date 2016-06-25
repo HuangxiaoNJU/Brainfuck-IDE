@@ -32,7 +32,7 @@ public class LoginDialog extends JDialog {
 		this.mainFrame = mainFrame;
 		this.loginDialog = this;
 		
-		// ÌáÊ¾±êÇ©
+		// ï¿½ï¿½Ê¾ï¿½ï¿½Ç©
 		JLabel userId = new JLabel("UserId:");
 		JLabel password = new JLabel("Password:");
 		userId.setBounds(30, 30, 80, 20);
@@ -40,7 +40,7 @@ public class LoginDialog extends JDialog {
 		loginDialog.add(userId);
 		loginDialog.add(password);
 		
-		// ÓÃ»§Ãû¡¢ÃÜÂëÎÄ±¾¿ò
+		// ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½ï¿½
 		userIdField = new JTextField();
 		passwordField = new JPasswordField();
 		userIdField.setBounds(100, 30, 130, 20);
@@ -49,20 +49,20 @@ public class LoginDialog extends JDialog {
 		loginDialog.add(userIdField);
 		loginDialog.add(passwordField);
 
-		// µÇÂ¼¡¢×¢²á°´Å¥
+		// ï¿½ï¿½Â¼ï¿½ï¿½×¢ï¿½á°´Å¥
 		JButton login = new JButton("log in");
 		JButton signup = new JButton("sign up");
 		login.setBounds(30, 130, 80, 20);
 		signup.setBounds(140, 130, 80, 20);
 		loginDialog.add(login);
 		loginDialog.add(signup);
-		// °²×°°´Å¥¼àÌýÆ÷
+		// ï¿½ï¿½×°ï¿½ï¿½Å¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		login.addActionListener(new loginListener());
 		signup.addActionListener(new signupListener());
 		
-		// ¶Ô»°¿òÊôÐÔÉèÖÃ
+		// ï¿½Ô»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		loginDialog.setSize(250, 200);
-		// ¾ÓÖÐÏÔÊ¾
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
 		Dimension screen = toolkit.getScreenSize();
 		int x = (screen.width - this.getWidth()) >> 1;
@@ -75,7 +75,7 @@ public class LoginDialog extends JDialog {
 	}
 	
 	/**
-	 * µÇÂ¼°´Å¥¼àÌýÆ÷
+	 * ï¿½ï¿½Â¼ï¿½ï¿½Å¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	class loginListener implements ActionListener {
 
@@ -85,7 +85,7 @@ public class LoginDialog extends JDialog {
 			String password = new String(passwordField.getPassword());
 			try {
 				String info = RemoteHelper.getInstance().getUserService().login(username, password);
-				// µÇÂ¼³É¹¦
+				// ï¿½ï¿½Â¼ï¿½É¹ï¿½
 				if(info.equals("success")) {
 					loginDialog.dispose();
 					mainFrame.fileName = null;
@@ -99,7 +99,7 @@ public class LoginDialog extends JDialog {
 					
 					JOptionPane.showMessageDialog(null, "Log in succeed!");
 				}
-				// µÇÂ¼Ê§°Ü£¬ÌáÊ¾´íÎóÐÅÏ¢
+				// ï¿½ï¿½Â¼Ê§ï¿½Ü£ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
 				else {
 					userIdField.setText("");
 					passwordField.setText("");
@@ -112,7 +112,7 @@ public class LoginDialog extends JDialog {
 	}
 	
 	/**
-	 * ×¢²á°´Å¥¼àÌýÆ÷
+	 * ×¢ï¿½á°´Å¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	class signupListener implements ActionListener {
 		@Override
@@ -121,11 +121,11 @@ public class LoginDialog extends JDialog {
 			String password = new String(passwordField.getPassword());
 			try {
 				String info = RemoteHelper.getInstance().getUserService().signup(username, password);
-				// ×¢²á³É¹¦
+				// ×¢ï¿½ï¿½É¹ï¿½
 				if(info.equals("success")) {
 					JOptionPane.showMessageDialog(null, "Sign up succeed!");
 				}
-				// ×¢²áÊ§°Ü£¬ÌáÊ¾´íÎóÐÅÏ¢
+				// ×¢ï¿½ï¿½Ê§ï¿½Ü£ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
 				else {
 					userIdField.setText("");
 					passwordField.setText("");

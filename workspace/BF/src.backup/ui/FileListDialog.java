@@ -26,13 +26,13 @@ public class FileListDialog extends JDialog {
 		this.mainFrame = mainFrame;
 		this.fileListDialog = this;
 		
-		// ÌáÊ¾±êÇ©
+		// ï¿½ï¿½Ê¾ï¿½ï¿½Ç©
 		JLabel promptLabel = new JLabel(mainFrame.username + "'s all files:");
 		promptLabel.setHorizontalAlignment(JLabel.CENTER);
 		promptLabel.setBounds(0, 5, 160, 30);
 		fileListDialog.add(promptLabel);
 		
-		// ÎÄ¼þÁÐ±í
+		// ï¿½Ä¼ï¿½ï¿½Ð±ï¿½
 		String[] fileNames = null;
 		try {
 			fileNames = RemoteHelper.getInstance().getIOService().readFileList(mainFrame.username);
@@ -46,14 +46,14 @@ public class FileListDialog extends JDialog {
 		scroller.setBounds(30, 40, 100, 140);
 		fileListDialog.add(scroller);
 		
-		// Ñ¡Ôñ°´Å¥
+		// Ñ¡ï¿½ï¿½Å¥
 		JButton selectButton = new JButton("Select");
 		selectButton.setBounds(140, 180, 100, 30);
 		selectButton.addActionListener(new selectListener());
 		selectButton.setVisible(true);
 		fileListDialog.add(selectButton);
 		
-		// ¶Ô»°¿òÊôÐÔÉèÖÃ
+		// ï¿½Ô»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		fileListDialog.setLayout(null);
 		fileListDialog.setSize(250, 250);
 		fileListDialog.setLocation(520, 300);

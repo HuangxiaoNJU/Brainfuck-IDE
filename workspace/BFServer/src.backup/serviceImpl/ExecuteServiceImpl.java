@@ -1,4 +1,4 @@
-//请不要修改本文件名
+//锟诫不要锟睫改憋拷锟侥硷拷锟斤拷
 package serviceImpl;
 
 import java.rmi.RemoteException;
@@ -21,7 +21,7 @@ public class ExecuteServiceImpl implements ExecuteService {
 	}
 
 	private void compile(String code, int ptr) {
-		// BF代码运行到的位置
+		// BF锟斤拷锟斤拷锟斤拷锟叫碉拷锟斤拷位锟斤拷
 		int position = 0;
 		while (position < code.length()) {
 			switch(code.charAt(position)) {
@@ -40,7 +40,7 @@ public class ExecuteServiceImpl implements ExecuteService {
 				input = input.substring(1);
 				break;
 			case '[':	
-				// 寻找 “[” 对应的 “]”
+				// 寻锟斤拷 锟斤拷[锟斤拷 锟斤拷应锟斤拷 锟斤拷]锟斤拷
 				int temp = 0;
 				for (int j = position + 1; j < code.length(); j++) {
 					if(code.charAt(j) == '[') {

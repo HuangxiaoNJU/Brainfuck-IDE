@@ -14,15 +14,15 @@ public class IOServiceImpl implements IOService{
 		
 	@Override
 	public boolean createFile(String userId, String fileName) throws RemoteException {
-		// ´´½¨¸ÃÓÃ»§ÎÄ¼þÄ¿Â¼£¬ÒÔÆäÓÃ»§ÃûÃüÃû
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ä¼ï¿½Ä¿Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		File filePath = new File("Users/" + userId);
 		if(!filePath.exists())
 			filePath.mkdir();
 		File file = new File(filePath, fileName);
-		// ÈôÎÄ¼þÒÑ´æÔÚ£¬´´½¨Ê§°Ü
+		// ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ñ´ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½
 		if(file.exists())
 			return false;
-		// ÎÄ¼þ²»´æÔÚ£¬´´½¨¸ÃÎÄ¼þ
+		// ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½
 		try {
 			file.createNewFile();
 		} catch (IOException e) {
@@ -54,7 +54,7 @@ public class IOServiceImpl implements IOService{
 		try {
 			BufferedReader bf = new BufferedReader(new FileReader(file));
 			String str = bf.readLine();
-			// ÎÄ¼þÄÚÈÝÎª¿Õ
+			// ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½
 			if(str == null) {
 				bf.close();
 				return "";
@@ -77,12 +77,12 @@ public class IOServiceImpl implements IOService{
 	@Override
 	public String[] readFileList(String userId) {
 		File directory = new File("Users/" + userId);
-		// ÈôÄ¿Â¼²»´æÔÚ£¬Ôò¸ÃÓÃ»§»¹Î´´´½¨¹ýÎÄ¼þ
+		// ï¿½ï¿½Ä¿Â¼ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½Î´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½
 		if(!directory.exists()) {
 			return null;
 		}
 		File[] files = directory.listFiles();
-		// ¹ýÂËÒþ²ØÎÄ¼þ
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½
 		int length = files.length;
 		for (int i = 0; i < files.length; i++)
 			if(files[i].isHidden())
