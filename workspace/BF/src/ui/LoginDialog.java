@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.rmi.RemoteException;
 
 import javax.swing.JButton;
@@ -17,9 +19,6 @@ import rmi.RemoteHelper;
 
 public class LoginDialog extends JDialog {
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private JDialog loginDialog;
 	private MainFrame mainFrame;
@@ -32,6 +31,8 @@ public class LoginDialog extends JDialog {
 		this.mainFrame = mainFrame;
 		this.loginDialog = this;
 		
+		LoginListener loginListener = new LoginListener();
+		
 		// 提示标签
 		JLabel userId = new JLabel("UserId:");
 		JLabel password = new JLabel("Password:");
@@ -43,6 +44,8 @@ public class LoginDialog extends JDialog {
 		// 用户名、密码文本框
 		userIdField = new JTextField();
 		passwordField = new JPasswordField();
+		userIdField.addKeyListener(loginListener);
+		passwordField.addKeyListener(loginListener);
 		userIdField.setBounds(100, 30, 130, 20);
 //		userIdField.requestFocus();
 		passwordField.setBounds(100, 80, 130, 20);
@@ -57,8 +60,8 @@ public class LoginDialog extends JDialog {
 		loginDialog.add(login);
 		loginDialog.add(signup);
 		// 安装按钮监听器
-		login.addActionListener(new loginListener());
-		signup.addActionListener(new signupListener());
+		login.addActionListener(loginListener);
+		signup.addActionListener(new SignupListener());
 		
 		// 对话框属性设置
 		loginDialog.setSize(250, 200);
@@ -77,10 +80,9 @@ public class LoginDialog extends JDialog {
 	/**
 	 * 登录按钮监听器
 	 */
-	class loginListener implements ActionListener {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
+	class LoginListener extends KeyAdapter implements ActionListener {
+		
+		private void login() {
 			String username = userIdField.getText();
 			String password = new String(passwordField.getPassword());
 			try {
@@ -109,12 +111,21 @@ public class LoginDialog extends JDialog {
 				e1.printStackTrace();
 			}
 		}
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			login();
+		}
+		@Override
+		public void keyPressed(KeyEvent e) {
+			if(e.getKeyCode() == KeyEvent.VK_ENTER)
+				login();
+		}
 	}
 	
 	/**
 	 * 注册按钮监听器
 	 */
-	class signupListener implements ActionListener {
+	class SignupListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String username = userIdField.getText();

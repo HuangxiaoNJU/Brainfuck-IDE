@@ -7,7 +7,7 @@ import service.ExecuteService;
 
 public class ExecuteServiceImpl implements ExecuteService {
 	
-	private int[] array = new int[1024];
+	private int[] array = new int[128];
 	
 	private String input;
 	

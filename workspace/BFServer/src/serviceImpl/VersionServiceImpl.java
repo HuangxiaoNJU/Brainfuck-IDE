@@ -16,15 +16,22 @@ public class VersionServiceImpl implements VersionService {
 	 * 版本文件目录
 	 */
 	private static File versionDirectory;
+	/**
+	 * 上一版本内容
+	 */
+	private static String lastVersion;
 	
 	public VersionServiceImpl() {
 		versionDirectory = new File("Version");
 		if(!versionDirectory.exists())
 			versionDirectory.mkdir();
+		lastVersion = null;
 	}
 
 	@Override
-	public String saveVersion(String code, String versionName) throws RemoteException {
+	public boolean saveVersion(String code, String versionName) throws RemoteException {
+		if(code.equals(lastVersion))
+			return false;
 		File versionFile = new File(versionDirectory, versionName);
 		try {
 			if(!versionFile.exists()) {
@@ -37,7 +44,8 @@ public class VersionServiceImpl implements VersionService {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return "success";
+		lastVersion = code;
+		return true;
 	}
 
 	@Override
@@ -71,6 +79,7 @@ public class VersionServiceImpl implements VersionService {
 
 	@Override
 	public void clear() throws RemoteException {
+		lastVersion = null;
 		File[] files = versionDirectory.listFiles();
 		for (int i = 0; i < files.length; i++) {
 			files[i].delete();

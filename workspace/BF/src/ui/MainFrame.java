@@ -5,8 +5,6 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,6 +28,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.filechooser.FileFilter;
 
 import rmi.RemoteHelper;
+import undo_redo.TextAreaListener;
 
 
 public class MainFrame extends JFrame {
@@ -72,9 +71,17 @@ public class MainFrame extends JFrame {
 	 */
 	public JMenuItem newMenuItem;
 	/**
+	 * 打开菜单项
+	 */
+	public JMenuItem openMenuItem;
+	/**
 	 * 保存菜单项
 	 */
 	public JMenuItem saveMenuItem;
+	/**
+	 * 退出菜单项
+	 */
+	public JMenuItem exitMenuItem;
 	/**
 	 * 版本菜单项
 	 */
@@ -105,12 +112,13 @@ public class MainFrame extends JFrame {
 		newMenuItem = new JMenuItem("New");
 		newMenuItem.setEnabled(false);
 		fileMenu.add(newMenuItem);
-		JMenuItem openMenuItem = new JMenuItem("Open");
+		openMenuItem = new JMenuItem("Open");
 		fileMenu.add(openMenuItem);
 		saveMenuItem = new JMenuItem("Save");
 		saveMenuItem.setEnabled(false);
 		fileMenu.add(saveMenuItem);
-		JMenuItem exitMenuItem = new JMenuItem("Exit");
+		exitMenuItem = new JMenuItem("Exit");
+		exitMenuItem.setEnabled(false);
 		fileMenu.add(exitMenuItem);
 		
 		JMenu runMenu = new JMenu("Run");
@@ -160,7 +168,7 @@ public class MainFrame extends JFrame {
 
 		// 代码文本区
 		codeArea = new JTextArea();
-		codeArea.addKeyListener(new UndoRedoListener());
+		codeArea.addKeyListener(new TextAreaListener(codeArea));
 		codeArea.setLineWrap(true);
 		codeArea.setMargin(new Insets(10, 10, 10, 10));
 		scroller = new JScrollPane(codeArea);
@@ -172,7 +180,7 @@ public class MainFrame extends JFrame {
 		// 输入文本区
 		inputArea = new JTextArea("Input");
 		inputArea.setLineWrap(true);
-		inputArea.setMargin(new Insets(20, 20, 0, 0));
+		inputArea.setMargin(new Insets(15, 15, 15, 15));
 		scroller = new JScrollPane(inputArea);
 		scroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -182,8 +190,9 @@ public class MainFrame extends JFrame {
 		// 输出文本区
 		outputArea = new JTextArea("Output");
 		outputArea.setEditable(false);
+		outputArea.setWrapStyleWord(true);
 		outputArea.setLineWrap(true);
-		outputArea.setMargin(new Insets(20, 20, 0, 0));
+		outputArea.setMargin(new Insets(15, 15, 15, 15));
 		scroller = new JScrollPane(outputArea);
 		scroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -199,6 +208,7 @@ public class MainFrame extends JFrame {
 		int y = ((screen.height - this.getHeight()) >> 1) - 20;
 		mainFrame.setLocation(x, y);
 		
+		// 窗体属性设置
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setSize(500, 420);
 		mainFrame.setResizable(false);
@@ -238,8 +248,9 @@ public class MainFrame extends JFrame {
 						fileName = newFile;
 						codeArea.setText("");
 						saveMenuItem.setEnabled(true);
-						JOptionPane.showMessageDialog(null, "New succeed!");
+						exitMenuItem.setEnabled(true);
 						clearVersion();
+						JOptionPane.showMessageDialog(null, "New succeed!");
 					}
 					else {
 						JOptionPane.showMessageDialog(null, newFile + " already exists!", "Error", JOptionPane.WARNING_MESSAGE);
@@ -340,20 +351,21 @@ public class MainFrame extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String code = codeArea.getText();
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
+			String versionName = dateFormat.format(new Date());
 			try {
-				if (RemoteHelper.getInstance().getIOService().writeFile(code, username, fileName)) {
-					// 保存版本
-					SimpleDateFormat dateFormat = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
-					String versionName = dateFormat.format(new Date());
+				if (RemoteHelper.getInstance().getVersionService().saveVersion(code, versionName)) {
 					
-					RemoteHelper.getInstance().getVersionService().saveVersion(code, versionName);
-				    
+					RemoteHelper.getInstance().getIOService().writeFile(code, username, fileName);
 					JMenuItem versionItem = new JMenuItem(versionName);
 					versionMenu.add(versionItem);
 					versionItem.addActionListener(new VersionListener());
 					versionMenu.setEnabled(true);
 					// 提示信息
 					JOptionPane.showMessageDialog(null, "Save succeed!\n" + versionName);
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "You didn't make any change!", "Error", JOptionPane.WARNING_MESSAGE);
 				}
 			} catch (RemoteException e1) {
 				e1.printStackTrace();
@@ -368,6 +380,7 @@ public class MainFrame extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			codeArea.setText("");
+			saveMenuItem.setEnabled(false);
 			fileName = null;
 			fileInfoLabel.setText("No file");
 			// 清除版本信息
@@ -386,10 +399,14 @@ public class MainFrame extends JFrame {
 				String code = RemoteHelper.getInstance().getVersionService().readVersion(versionName);
 				codeArea.setText(code);
 				RemoteHelper.getInstance().getIOService().writeFile(code, username, fileName);
+				versionMenu.remove((JMenuItem)e.getSource());
+				if(versionMenu.getItemCount() == 0)
+					versionMenu.setEnabled(false);
+				
+				JOptionPane.showMessageDialog(null, "Return to version:\n" + versionName);
 			} catch (RemoteException e1) {
 				e1.printStackTrace();
 			}
-			versionMenu.remove((JMenuItem)e.getSource());
 		}
 	}
 	
@@ -409,6 +426,7 @@ public class MainFrame extends JFrame {
 	class LogoutActionLisener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			new LoginDialog(mainFrame);
 			username = null;
 			fileName = null;
 			codeArea.setText("");
@@ -418,25 +436,10 @@ public class MainFrame extends JFrame {
 			loginButton.setVisible(true);
 			newMenuItem.setEnabled(false);
 			saveMenuItem.setEnabled(false);
+			exitMenuItem.setEnabled(false);
 			// 清除版本信息
 			clearVersion();
 		}
 	}
 	
-	/**
-	 * 撤销(Ctrl+Z)重做(Ctrl+Y)键盘监听器
-	 */
-	class UndoRedoListener implements KeyListener {
-		@Override
-		public void keyPressed(KeyEvent e) {
-			if(e.getKeyCode() == KeyEvent.VK_Z && e.isControlDown()) {
-				System.out.println("Undo");
-			}
-			else if(e.getKeyCode() == KeyEvent.VK_Y && e.isControlDown()) {
-				System.out.println("Redo");
-			}
-		}
-		public void keyTyped(KeyEvent e) {}
-		public void keyReleased(KeyEvent e) {}
-	}
 }

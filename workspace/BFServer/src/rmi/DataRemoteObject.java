@@ -68,7 +68,7 @@ public class DataRemoteObject extends UnicastRemoteObject implements ExecuteServ
 	}
 
 	@Override
-	public String saveVersion(String code, String versionName) throws RemoteException {
+	public boolean saveVersion(String code, String versionName) throws RemoteException {
 		return versionService.saveVersion(code, versionName);
 	}
 
