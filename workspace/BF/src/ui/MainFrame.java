@@ -1,5 +1,6 @@
 package ui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.Toolkit;
@@ -123,6 +124,8 @@ public class MainFrame extends JFrame {
 		
 		JMenu runMenu = new JMenu("Run");
 		menuBar.add(runMenu);
+		JMenuItem compileMenuItem = new JMenuItem("Compile");
+		runMenu.add(compileMenuItem);
 		JMenuItem executeMenuItem = new JMenuItem("Execute");
 		runMenu.add(executeMenuItem);
 		
@@ -138,6 +141,7 @@ public class MainFrame extends JFrame {
 		openMenuItem.addActionListener(new OpenActionListener());
 		saveMenuItem.addActionListener(new SaveActionListener());
 		exitMenuItem.addActionListener(new ExitActionListener());
+		compileMenuItem.addActionListener(new CompileActionListener());
 		executeMenuItem.addActionListener(new ExecuteActionListener());
 		
 		// 文件信息
@@ -168,7 +172,7 @@ public class MainFrame extends JFrame {
 
 		// 代码文本区
 		codeArea = new JTextArea();
-		codeArea.addKeyListener(new TextAreaListener(codeArea));
+		codeArea.addKeyListener(new TextAreaListener(codeArea, ""));
 		codeArea.setLineWrap(true);
 		codeArea.setMargin(new Insets(10, 10, 10, 10));
 		scroller = new JScrollPane(codeArea);
@@ -178,7 +182,7 @@ public class MainFrame extends JFrame {
 		mainFrame.add(scroller);
 		
 		// 输入文本区
-		inputArea = new JTextArea("Input");
+		inputArea = new JTextArea("Input Section");
 		inputArea.setLineWrap(true);
 		inputArea.setMargin(new Insets(15, 15, 15, 15));
 		scroller = new JScrollPane(inputArea);
@@ -188,7 +192,7 @@ public class MainFrame extends JFrame {
 		mainFrame.add(scroller);
 		
 		// 输出文本区
-		outputArea = new JTextArea("Output");
+		outputArea = new JTextArea("Output Section");
 		outputArea.setEditable(false);
 		outputArea.setWrapStyleWord(true);
 		outputArea.setLineWrap(true);
@@ -222,7 +226,7 @@ public class MainFrame extends JFrame {
 	/**
 	 * 清空版本信息
 	 */
-	private void clearVersion() {
+	public void clearVersion() {
 		versionMenu.setEnabled(false);
 		// 清空版本菜单项
 		versionMenu.removeAll();
@@ -247,6 +251,7 @@ public class MainFrame extends JFrame {
 						fileInfoLabel.setText(newFile);
 						fileName = newFile;
 						codeArea.setText("");
+						codeArea.addKeyListener(new TextAreaListener(codeArea, ""));
 						saveMenuItem.setEnabled(true);
 						exitMenuItem.setEnabled(true);
 						clearVersion();
@@ -261,6 +266,27 @@ public class MainFrame extends JFrame {
 			}
 		}
 	}
+	
+	/**
+	 * 编译监听器
+	 */
+	class CompileActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String code = codeArea.getText();
+			String param = inputArea.getText();
+			try {
+				String info = RemoteHelper.getInstance().getCompileService().compile(code, param);
+				outputArea.setText(info);
+				if(!info.equals("Success"))
+					outputArea.setForeground(Color.RED);
+				else
+					outputArea.setForeground(Color.BLACK);
+			} catch (RemoteException e1) {
+				e1.printStackTrace();
+			}
+		}
+	}
 
 	/**
 	 * 运行监听器
@@ -271,7 +297,15 @@ public class MainFrame extends JFrame {
 			String code = codeArea.getText();
 			String param = inputArea.getText();
 			try {
-				outputArea.setText(RemoteHelper.getInstance().getExecuteService().execute(code, param));
+				String info = RemoteHelper.getInstance().getCompileService().compile(code, param);
+				if(info.equals("Success")) {
+					outputArea.setForeground(Color.BLACK);
+					outputArea.setText(RemoteHelper.getInstance().getExecuteService().execute(code, param));
+				}
+				else {
+					outputArea.setForeground(Color.RED);
+					outputArea.setText(info);
+				}
 			} catch (RemoteException e1) {
 				e1.printStackTrace();
 			}
@@ -300,21 +334,19 @@ public class MainFrame extends JFrame {
 						return ".rtf .txt";
 					}
 				});
-				// 选择类型错误 TODO
 				jfc.showDialog(new JLabel(), "Choose");
 				jfc.setMultiSelectionEnabled(false);
 				File file = jfc.getSelectedFile();
-				if(file != null && file.getName().endsWith(".rtf")) {
+				if(file != null && (file.getName().endsWith(".rtf") || file.getName().endsWith(".txt"))) {
 					saveMenuItem.setEnabled(true);
 					fileName = file.getAbsolutePath();
 					fileInfoLabel.setText(file.getName());
 					codeArea.setText("");
 					try {
 						BufferedReader bf = new BufferedReader(new FileReader(file));
-						String str = bf.readLine();
-						while (str != null) {
-							codeArea.append(str);
-							str = bf.readLine();
+						String str;
+						while ((str = bf.readLine()) != null) {
+							codeArea.append(str + '\n');
 						}
 						bf.close();
 					} catch (FileNotFoundException e1) {
@@ -322,6 +354,7 @@ public class MainFrame extends JFrame {
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
+					codeArea.addKeyListener(new TextAreaListener(codeArea, codeArea.getText()));
 				}
 			}
 			// 已登录，则打开该用户已创建的文件
@@ -339,8 +372,6 @@ public class MainFrame extends JFrame {
 					e1.printStackTrace();
 				}
 			}
-			// 清除版本信息
-			clearVersion();
 		}
 	}
 
@@ -398,6 +429,7 @@ public class MainFrame extends JFrame {
 			try {
 				String code = RemoteHelper.getInstance().getVersionService().readVersion(versionName);
 				codeArea.setText(code);
+				codeArea.addKeyListener(new TextAreaListener(codeArea, code));
 				RemoteHelper.getInstance().getIOService().writeFile(code, username, fileName);
 				versionMenu.remove((JMenuItem)e.getSource());
 				if(versionMenu.getItemCount() == 0)
@@ -426,10 +458,10 @@ public class MainFrame extends JFrame {
 	class LogoutActionLisener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			new LoginDialog(mainFrame);
 			username = null;
 			fileName = null;
 			codeArea.setText("");
+			codeArea.addKeyListener(new TextAreaListener(codeArea, ""));
 			fileInfoLabel.setText("No file");
 			logInfoLabel.setText("Please log in:");
 			logoutButton.setVisible(false);
@@ -439,6 +471,7 @@ public class MainFrame extends JFrame {
 			exitMenuItem.setEnabled(false);
 			// 清除版本信息
 			clearVersion();
+			new LoginDialog(mainFrame);
 		}
 	}
 	

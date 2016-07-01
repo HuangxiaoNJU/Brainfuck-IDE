@@ -89,7 +89,11 @@ public class UserServiceImpl implements UserService{
 	
 	@Override
 	public String signup(String username, String password) throws RemoteException {
-		// 用户名、密码空格检查
+		// 用户名、密码格式检查
+		if(username.equals(""))
+			return "User name cannot be null!";
+		if(password.equals(""))
+			return "Password cannot be null!";
 		for (int i = 0; i < username.length(); i++) {
 			if(username.charAt(i) == ' ')
 				return "User name cannot contain spaces!";

@@ -62,7 +62,7 @@ public class IOServiceImpl implements IOService{
 			content += str;
 			str = bf.readLine();
 			while(str != null) {
-				content += "\r\n" + str;
+				content += "\n" + str;
 				str = bf.readLine();
 			}
 			bf.close();

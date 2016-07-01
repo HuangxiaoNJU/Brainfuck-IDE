@@ -27,13 +27,13 @@ public class TextAreaListener extends KeyAdapter {
 	 */
 	private String nowString;
 	
-	public TextAreaListener(JTextArea codeArea) {
+	public TextAreaListener(JTextArea codeArea, String content) {
 		textArea = codeArea;
 		undo = new Stack<String>();
 		redo = new Stack<String>();
 		lastCommand = "";
 		isUndoOrRedo = false;
-		nowString = "";
+		nowString = content;
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class TextAreaListener extends KeyAdapter {
 	
 	@Override
 	public void keyReleased(KeyEvent e) {
-		if(isUndoOrRedo)
+		if(isUndoOrRedo || textArea.getText().equals(nowString))
 			return;
 		// 如果进行撤销或重做操作后紧跟其他操作，则清空撤销栈和重做栈
 		if(lastCommand.equals("Undo") || lastCommand.equals("Redo")) {
@@ -85,7 +85,7 @@ public class TextAreaListener extends KeyAdapter {
 		// nowString记录操作后文本内容
 		nowString = textArea.getText();
 		
-		// 连续操作合并
+		// 重复操作合并
 		switch(e.getKeyCode()) {
 		case KeyEvent.VK_TAB:
 			if(lastCommand.equals("Tab")) undo.pop();
@@ -108,7 +108,8 @@ public class TextAreaListener extends KeyAdapter {
 			else lastCommand = "Backspace";
 			break;
 		default:
-			lastCommand = "Other";
+			if(lastCommand.equals("Other:" + e.getKeyChar())) undo.pop();
+			else lastCommand = "Other:" + e.getKeyChar();
 			break;
 		}
 	}

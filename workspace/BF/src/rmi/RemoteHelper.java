@@ -2,6 +2,7 @@ package rmi;
 
 import java.rmi.Remote;
 
+import service.CompileService;
 import service.ExecuteService;
 import service.IOService;
 import service.UserService;
@@ -20,6 +21,10 @@ public class RemoteHelper {
 	
 	public void setRemote(Remote remote) {
 		this.remote = remote;
+	}
+	
+	public CompileService getCompileService() {
+		return (CompileService)remote;
 	}
 	
 	public ExecuteService getExecuteService() {

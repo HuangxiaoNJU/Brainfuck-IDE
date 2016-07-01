@@ -1,5 +1,7 @@
 package ui;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
@@ -8,14 +10,16 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
 import rmi.RemoteHelper;
+import undo_redo.TextAreaListener;
 
 public class FileListDialog extends JDialog {
-
 	private static final long serialVersionUID = 1L;
+	
 	private MainFrame mainFrame;
 	private JDialog fileListDialog;
 	private JList<String> fileList;
@@ -56,9 +60,14 @@ public class FileListDialog extends JDialog {
 		// 对话框属性设置
 		fileListDialog.setLayout(null);
 		fileListDialog.setSize(250, 250);
-		fileListDialog.setLocation(520, 300);
+		// 居中显示
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Dimension screen = toolkit.getScreenSize();
+		int x = (screen.width - this.getWidth()) >> 1;
+		int y = ((screen.height - this.getHeight()) >> 1) - 20;
+		fileListDialog.setLocation(x, y);
+		
 		fileListDialog.setResizable(false);
-		fileListDialog.setAlwaysOnTop(true);
 		fileListDialog.setVisible(true);
 	}
 	
@@ -67,14 +76,21 @@ public class FileListDialog extends JDialog {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String fileName = fileList.getSelectedValue();
+			if(fileName.equals(mainFrame.fileName)) {
+				JOptionPane.showMessageDialog(null, "You have already opened " + fileName, "Warning", JOptionPane.WARNING_MESSAGE);
+				return;
+			}
 			mainFrame.fileName = fileName;
 			mainFrame.fileInfoLabel.setText(fileName);
 			mainFrame.saveMenuItem.setEnabled(true);
 			try {
-				mainFrame.codeArea.setText(RemoteHelper.getInstance().getIOService().readFile(mainFrame.username, fileName));
+				String content = RemoteHelper.getInstance().getIOService().readFile(mainFrame.username, fileName);
+				mainFrame.codeArea.setText(content);
+				mainFrame.codeArea.addKeyListener(new TextAreaListener(mainFrame.codeArea, content));
 			} catch (RemoteException e1) {
 				e1.printStackTrace();
 			}
+			mainFrame.clearVersion();
 			fileListDialog.dispose();
 		}
 		

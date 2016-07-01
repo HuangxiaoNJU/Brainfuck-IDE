@@ -3,18 +3,21 @@ package rmi;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+import service.CompileService;
 import service.ExecuteService;
 import service.IOService;
 import service.UserService;
 import service.VersionService;
+import serviceImpl.CompileServiceImpl;
 import serviceImpl.ExecuteServiceImpl;
 import serviceImpl.IOServiceImpl;
 import serviceImpl.UserServiceImpl;
 import serviceImpl.VersionServiceImpl;
 
-public class DataRemoteObject extends UnicastRemoteObject implements ExecuteService, IOService, UserService, VersionService {
+public class DataRemoteObject extends UnicastRemoteObject implements CompileService, ExecuteService, IOService, UserService, VersionService {
 	
 	private static final long serialVersionUID = 4029039744279087114L;
+	private CompileService compileService;
 	private ExecuteService executeService;
 	private IOService iOService;
 	private UserService userService;
@@ -23,6 +26,7 @@ public class DataRemoteObject extends UnicastRemoteObject implements ExecuteServ
 	protected DataRemoteObject() throws RemoteException {
 		iOService = new IOServiceImpl();
 		userService = new UserServiceImpl();
+		compileService = new CompileServiceImpl();
 		executeService = new ExecuteServiceImpl();
 		versionService = new VersionServiceImpl();
 	}
@@ -80,6 +84,11 @@ public class DataRemoteObject extends UnicastRemoteObject implements ExecuteServ
 	@Override
 	public void clear() throws RemoteException {
 		versionService.clear();
+	}
+
+	@Override
+	public String compile(String code, String param) throws RemoteException {
+		return compileService.compile(code, param);
 	}
 
 
