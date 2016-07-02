@@ -223,18 +223,6 @@ public class MainFrame extends JFrame {
 		new LoginDialog(mainFrame);
 	}
 	
-//	public void clearVersion() {
-//		versionMenu.setEnabled(false);
-//		// 清空版本菜单项
-//		versionMenu.removeAll();
-//		// 删除服务器版本文件
-//		try {
-//			RemoteHelper.getInstance().getVersionService().clear();
-//		} catch (RemoteException e1) {
-//			e1.printStackTrace();
-//		}
-//	}
-	
 	/**
 	 * 新建文件监听器
 	 */
@@ -242,7 +230,7 @@ public class MainFrame extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String newFile = JOptionPane.showInputDialog("Please name your new file:");
-			if(newFile != null) {
+			if(!newFile.equals("")) {
 				try {
 					if(RemoteHelper.getInstance().getIOService().createFile(mainFrame.username, newFile)) {
 						fileInfoLabel.setText(newFile);
@@ -261,6 +249,8 @@ public class MainFrame extends JFrame {
 					e1.printStackTrace();
 				}
 			}
+			else
+				JOptionPane.showMessageDialog(null, "File name cannot be null!", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
@@ -294,11 +284,14 @@ public class MainFrame extends JFrame {
 			String code = codeArea.getText();
 			String param = inputArea.getText();
 			try {
+				// 获取编译信息
 				String info = RemoteHelper.getInstance().getCompileService().compile(code, param);
+				// 编译成功则运行
 				if(info.equals("Success")) {
 					outputArea.setForeground(Color.BLACK);
 					outputArea.setText(RemoteHelper.getInstance().getExecuteService().execute(code, param));
 				}
+				// 编译失败提示错误信息
 				else {
 					outputArea.setForeground(Color.RED);
 					outputArea.setText(info);
@@ -379,6 +372,20 @@ public class MainFrame extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String code = codeArea.getText();
+			// 未登录，则保存本地文件
+			if(username == null) {
+				try {
+					if(RemoteHelper.getInstance().getIOService().writeFile(code, username, fileName)) {
+						JOptionPane.showMessageDialog(null, "Save succeed!");
+					}
+					else
+						JOptionPane.showMessageDialog(null, "Save failed!", "Error", JOptionPane.WARNING_MESSAGE);
+				} catch (RemoteException e1) {
+					e1.printStackTrace();
+				}
+				return;
+			}
+			// 已登录，则保存文件和版本在服务器
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
 			String versionName = dateFormat.format(new Date());
 			try {
@@ -407,6 +414,7 @@ public class MainFrame extends JFrame {
 	class ExitActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			// 界面内容变化
 			codeArea.setText("");
 			saveMenuItem.setEnabled(false);
 			fileName = null;
@@ -422,6 +430,7 @@ public class MainFrame extends JFrame {
 	class VersionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			// 恢复版本
 			String versionName = e.getActionCommand();
 			try {
 				String code = RemoteHelper.getInstance().getVersionService().readVersion(username, fileName, versionName);
@@ -431,7 +440,7 @@ public class MainFrame extends JFrame {
 				versionMenu.remove((JMenuItem)e.getSource());
 				if(versionMenu.getItemCount() == 0)
 					versionMenu.setEnabled(false);
-				
+				// 提示信息
 				JOptionPane.showMessageDialog(null, "Return to version:\n" + versionName);
 			} catch (RemoteException e1) {
 				e1.printStackTrace();
@@ -455,6 +464,12 @@ public class MainFrame extends JFrame {
 	class LogoutActionLisener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			try {
+				RemoteHelper.getInstance().getUserService().logout(username);
+			} catch (RemoteException e1) {
+				e1.printStackTrace();
+			}
+			// 界面内容变化
 			username = null;
 			fileName = null;
 			codeArea.setText("");

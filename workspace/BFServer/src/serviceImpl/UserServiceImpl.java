@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 
 import service.UserService;
 
@@ -69,7 +71,7 @@ public class UserServiceImpl implements UserService{
 	}
 	
 	/**
-	 * 检测登录是否成功
+	 * 检测用户名密码是否匹配
 	 */
 	private String LoginCheckInfo(String username, String password) {
 		try {
@@ -131,9 +133,20 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public String login(String username, String password) throws RemoteException {
 		String info = LoginCheckInfo(username, password);
-		// 已登录用户更新
+		// 用户名密码匹配成功
 		if(info.equals("success")) {
 			try {
+				// 检查用户是否已经登录
+				BufferedReader bf = new BufferedReader(new FileReader(onlineUsersFile));
+				String onlineUser;
+				while ((onlineUser = bf.readLine()) != null) {
+					if (onlineUser.equals(username)) {
+						bf.close();
+						return username + " is online!";
+					}
+				}
+				bf.close();
+				// 更新在线用户信息
 				FileWriter fw = new FileWriter(onlineUsersFile, true);
 				fw.write(username + '\n');
 				fw.flush();
@@ -147,6 +160,27 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public boolean logout(String username) throws RemoteException {
+		List<String> onlineUsers = new ArrayList<String>();
+		try {
+			BufferedReader bf = new BufferedReader(new FileReader(onlineUsersFile));
+			String onlineUser;
+			while((onlineUser = bf.readLine()) != null) {
+				if(!onlineUser.equals(username)) {
+					onlineUsers.add(onlineUser);
+				}
+			}
+			bf.close();
+			FileWriter fw = new FileWriter(onlineUsersFile, false);
+			for (int i = 0; i < onlineUsers.size(); i++) {
+				fw.write(onlineUsers.get(i));
+				fw.flush();
+			}
+			fw.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return true;
 	}
 

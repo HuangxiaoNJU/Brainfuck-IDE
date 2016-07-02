@@ -38,6 +38,7 @@ public class IOServiceImpl implements IOService{
 	@Override
 	public boolean writeFile(String content, String userId, String fileName) {
 		File file;
+		// 判断写入本地文件还是服务器文件
 		file = userId == null ? new File(fileName) : new File(new File("Users/" + userId), fileName);
 		try {
 			FileWriter fw = new FileWriter(file, false);
