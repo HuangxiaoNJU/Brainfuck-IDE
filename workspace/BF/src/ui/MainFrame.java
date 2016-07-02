@@ -223,20 +223,17 @@ public class MainFrame extends JFrame {
 		new LoginDialog(mainFrame);
 	}
 	
-	/**
-	 * 清空版本信息
-	 */
-	public void clearVersion() {
-		versionMenu.setEnabled(false);
-		// 清空版本菜单项
-		versionMenu.removeAll();
-		// 删除服务器版本文件
-		try {
-			RemoteHelper.getInstance().getVersionService().clear();
-		} catch (RemoteException e1) {
-			e1.printStackTrace();
-		}
-	}
+//	public void clearVersion() {
+//		versionMenu.setEnabled(false);
+//		// 清空版本菜单项
+//		versionMenu.removeAll();
+//		// 删除服务器版本文件
+//		try {
+//			RemoteHelper.getInstance().getVersionService().clear();
+//		} catch (RemoteException e1) {
+//			e1.printStackTrace();
+//		}
+//	}
 	
 	/**
 	 * 新建文件监听器
@@ -254,7 +251,7 @@ public class MainFrame extends JFrame {
 						codeArea.addKeyListener(new TextAreaListener(codeArea, ""));
 						saveMenuItem.setEnabled(true);
 						exitMenuItem.setEnabled(true);
-						clearVersion();
+						versionMenu.setEnabled(false);
 						JOptionPane.showMessageDialog(null, "New succeed!");
 					}
 					else {
@@ -366,7 +363,7 @@ public class MainFrame extends JFrame {
 						return;
 					}
 					else {
-						new FileListDialog(mainFrame);
+						new FileListDialog(mainFrame, new VersionListener());
 					}
 				} catch (RemoteException e1) {
 					e1.printStackTrace();
@@ -385,7 +382,7 @@ public class MainFrame extends JFrame {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
 			String versionName = dateFormat.format(new Date());
 			try {
-				if (RemoteHelper.getInstance().getVersionService().saveVersion(code, versionName)) {
+				if (RemoteHelper.getInstance().getVersionService().saveVersion(username, fileName, code, versionName)) {
 					
 					RemoteHelper.getInstance().getIOService().writeFile(code, username, fileName);
 					JMenuItem versionItem = new JMenuItem(versionName);
@@ -414,8 +411,8 @@ public class MainFrame extends JFrame {
 			saveMenuItem.setEnabled(false);
 			fileName = null;
 			fileInfoLabel.setText("No file");
-			// 清除版本信息
-			clearVersion();
+			versionMenu.setEnabled(false);
+			versionMenu.removeAll();
 		}
 	}
 	
@@ -427,7 +424,7 @@ public class MainFrame extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			String versionName = e.getActionCommand();
 			try {
-				String code = RemoteHelper.getInstance().getVersionService().readVersion(versionName);
+				String code = RemoteHelper.getInstance().getVersionService().readVersion(username, fileName, versionName);
 				codeArea.setText(code);
 				codeArea.addKeyListener(new TextAreaListener(codeArea, code));
 				RemoteHelper.getInstance().getIOService().writeFile(code, username, fileName);
@@ -462,6 +459,9 @@ public class MainFrame extends JFrame {
 			fileName = null;
 			codeArea.setText("");
 			codeArea.addKeyListener(new TextAreaListener(codeArea, ""));
+			inputArea.setText("Input Section");
+			outputArea.setText("Output Section");
+			outputArea.setForeground(Color.BLACK);
 			fileInfoLabel.setText("No file");
 			logInfoLabel.setText("Please log in:");
 			logoutButton.setVisible(false);
@@ -469,8 +469,8 @@ public class MainFrame extends JFrame {
 			newMenuItem.setEnabled(false);
 			saveMenuItem.setEnabled(false);
 			exitMenuItem.setEnabled(false);
-			// 清除版本信息
-			clearVersion();
+			versionMenu.setEnabled(false);
+			versionMenu.removeAll();
 			new LoginDialog(mainFrame);
 		}
 	}

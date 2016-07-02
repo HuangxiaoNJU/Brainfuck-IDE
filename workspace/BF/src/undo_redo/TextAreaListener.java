@@ -69,8 +69,9 @@ public class TextAreaListener extends KeyAdapter {
 	
 	@Override
 	public void keyReleased(KeyEvent e) {
-		if(isUndoOrRedo || textArea.getText().equals(nowString))
+		if(isUndoOrRedo || textArea.getText().equals(nowString)) {
 			return;
+		}
 		// 如果进行撤销或重做操作后紧跟其他操作，则清空撤销栈和重做栈
 		if(lastCommand.equals("Undo") || lastCommand.equals("Redo")) {
 			while(!undo.empty())

@@ -72,18 +72,18 @@ public class DataRemoteObject extends UnicastRemoteObject implements CompileServ
 	}
 
 	@Override
-	public boolean saveVersion(String code, String versionName) throws RemoteException {
-		return versionService.saveVersion(code, versionName);
+	public boolean saveVersion(String userId, String fileName, String code, String versionName) throws RemoteException {
+		return versionService.saveVersion(userId, fileName, code, versionName);
 	}
 
 	@Override
-	public String readVersion(String versionName) throws RemoteException {
-		return versionService.readVersion(versionName);
+	public String readVersion(String userId, String fileName, String versionName) throws RemoteException {
+		return versionService.readVersion(userId, fileName, versionName);
 	}
-
+	
 	@Override
-	public void clear() throws RemoteException {
-		versionService.clear();
+	public String[] readVersionList(String userId, String fileName) throws RemoteException {
+		return versionService.readVersionList(userId, fileName);
 	}
 
 	@Override

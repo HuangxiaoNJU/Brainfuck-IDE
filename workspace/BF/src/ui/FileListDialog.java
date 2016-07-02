@@ -10,24 +10,28 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
 import rmi.RemoteHelper;
+import ui.MainFrame.VersionListener;
 import undo_redo.TextAreaListener;
 
 public class FileListDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 	
 	private MainFrame mainFrame;
+	private VersionListener versionListener;
 	private JDialog fileListDialog;
 	private JList<String> fileList;
 	
-	public FileListDialog(MainFrame mainFrame) {
+	public FileListDialog(MainFrame mainFrame, VersionListener listener) {
 		super(mainFrame, "Open", true);
 		
 		this.mainFrame = mainFrame;
+		this.versionListener = listener;
 		this.fileListDialog = this;
 		
 		// 提示标签
@@ -76,6 +80,7 @@ public class FileListDialog extends JDialog {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String fileName = fileList.getSelectedValue();
+			// 若已打开此文件则提示错误
 			if(fileName.equals(mainFrame.fileName)) {
 				JOptionPane.showMessageDialog(null, "You have already opened " + fileName, "Warning", JOptionPane.WARNING_MESSAGE);
 				return;
@@ -83,6 +88,7 @@ public class FileListDialog extends JDialog {
 			mainFrame.fileName = fileName;
 			mainFrame.fileInfoLabel.setText(fileName);
 			mainFrame.saveMenuItem.setEnabled(true);
+			// 读取打开文件内容
 			try {
 				String content = RemoteHelper.getInstance().getIOService().readFile(mainFrame.username, fileName);
 				mainFrame.codeArea.setText(content);
@@ -90,7 +96,24 @@ public class FileListDialog extends JDialog {
 			} catch (RemoteException e1) {
 				e1.printStackTrace();
 			}
-			mainFrame.clearVersion();
+			mainFrame.versionMenu.setEnabled(true);
+			// 读取打开文件历史版本
+			mainFrame.versionMenu.removeAll();
+			try {
+				String[] versionFiles = null;
+				versionFiles = RemoteHelper.getInstance().getVersionService().readVersionList(mainFrame.username, fileName);
+				if(versionFiles.length == 0)
+					mainFrame.versionMenu.setEnabled(false);
+				else {
+					for (int i = 0; i < versionFiles.length; i++) {
+						JMenuItem versionItem = new JMenuItem(versionFiles[i]);
+						mainFrame.versionMenu.add(versionItem);
+						versionItem.addActionListener(versionListener);
+					}
+				}
+			} catch (RemoteException e1) {
+				e1.printStackTrace();
+			}
 			fileListDialog.dispose();
 		}
 		

@@ -13,25 +13,22 @@ import service.VersionService;
 public class VersionServiceImpl implements VersionService {
 	
 	/**
-	 * 版本文件目录
-	 */
-	private static File versionDirectory;
-	/**
 	 * 上一版本内容
 	 */
 	private static String lastVersion;
 	
 	public VersionServiceImpl() {
-		versionDirectory = new File("Version");
-		if(!versionDirectory.exists())
-			versionDirectory.mkdir();
-		lastVersion = null;
+//		File directory = new File("Version");
+//		if(!directory.exists())
+//			directory.mkdir();
+		lastVersion = "";
 	}
 
 	@Override
-	public boolean saveVersion(String code, String versionName) throws RemoteException {
+	public boolean saveVersion(String userId, String fileName, String code, String versionName) throws RemoteException {
 		if(code.equals(lastVersion))
 			return false;
+		File versionDirectory = new File("Version/" + userId + "/" + fileName);
 		File versionFile = new File(versionDirectory, versionName);
 		try {
 			if(!versionFile.exists()) {
@@ -49,9 +46,10 @@ public class VersionServiceImpl implements VersionService {
 	}
 
 	@Override
-	public String readVersion(String versionName) throws RemoteException {
+	public String readVersion(String userId, String fileName, String versionName) throws RemoteException {
 		// 恢复并删除此版本
 		String content = "";
+		File versionDirectory = new File("Version/" + userId + "/" + fileName);
 		File file = new File(versionDirectory, versionName);
 		try {
 			BufferedReader bf = new BufferedReader(new FileReader(file));
@@ -64,7 +62,7 @@ public class VersionServiceImpl implements VersionService {
 			content += str;
 			str = bf.readLine();
 			while(str != null) {
-				content += "\r\n" + str;
+				content += "\n" + str;
 				str = bf.readLine();
 			}
 			bf.close();
@@ -77,13 +75,32 @@ public class VersionServiceImpl implements VersionService {
 		return content;
 	}
 
+//	@Override
+//	public void clear() throws RemoteException {
+//		lastVersion = null;
+//		File[] files = versionDirectory.listFiles();
+//		for (int i = 0; i < files.length; i++) {
+//			files[i].delete();
+//		}
+//	}
+
 	@Override
-	public void clear() throws RemoteException {
-		lastVersion = null;
+	public String[] readVersionList(String userId, String fileName) {
+		File versionDirectory = new File("Version/" + userId + "/" + fileName);
 		File[] files = versionDirectory.listFiles();
-		for (int i = 0; i < files.length; i++) {
-			files[i].delete();
-		}
+		// 过滤隐藏文件
+		int length = files.length;
+		for (int i = 0; i < files.length; i++)
+			if(files[i].isHidden())
+				length --;
+		String[] fileNames = new String[length];
+		int ptr = 0;
+		for (int i = 0; i < files.length; i++)
+			if(!files[i].isHidden()) {
+				fileNames[ptr] = files[i].getName();
+				ptr ++;
+			}
+		return fileNames;
 	}
 
 }

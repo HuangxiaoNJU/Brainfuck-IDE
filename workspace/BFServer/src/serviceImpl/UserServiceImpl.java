@@ -18,6 +18,11 @@ public class UserServiceImpl implements UserService{
 	private static File passwordsFile;
 	
 	/**
+	 * onlineUsers记录所有在线用户
+	 */
+	private static File onlineUsersFile;
+	
+	/**
 	 * 用户文件目录
 	 */
 	private static File usersDirectory;
@@ -31,6 +36,13 @@ public class UserServiceImpl implements UserService{
 		usersDirectory = new File("Users");
 		if(!usersDirectory.exists())
 			usersDirectory.mkdir();
+		onlineUsersFile = new File("onLine_Users");
+		if(!onlineUsersFile.exists())
+			try {
+				onlineUsersFile.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 	}
 	
 	/**
@@ -107,7 +119,7 @@ public class UserServiceImpl implements UserService{
 		
 		try {
 			FileWriter fw = new FileWriter(passwordsFile, true);
-			fw.write(username + ' ' + password + "\r\n");
+			fw.write(username + ' ' + password + '\n');
 			fw.flush();
 			fw.close();
 		} catch (IOException e) {
@@ -118,12 +130,23 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public String login(String username, String password) throws RemoteException {
-		return LoginCheckInfo(username, password);
+		String info = LoginCheckInfo(username, password);
+		// 已登录用户更新
+		if(info.equals("success")) {
+			try {
+				FileWriter fw = new FileWriter(onlineUsersFile, true);
+				fw.write(username + '\n');
+				fw.flush();
+				fw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return info;
 	}
 
 	@Override
 	public boolean logout(String username) throws RemoteException {
-		// TODO
 		return true;
 	}
 

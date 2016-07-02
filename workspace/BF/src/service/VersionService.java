@@ -6,9 +6,10 @@ import java.rmi.RemoteException;
 
 public interface VersionService extends Remote {
 	
-	public boolean saveVersion(String code, String versionName) throws RemoteException;
+	public boolean saveVersion(String userId, String fileName, String code, String versionName) throws RemoteException;
 	
-	public String readVersion(String versionName) throws RemoteException;
+	public String readVersion(String userId, String fileName, String versionName) throws RemoteException;
 	
-	public void clear() throws RemoteException;
+	public String[] readVersionList(String userId, String fileName) throws RemoteException;
+	
 }

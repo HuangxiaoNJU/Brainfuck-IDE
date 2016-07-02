@@ -14,6 +14,10 @@ public class IOServiceImpl implements IOService{
 		
 	@Override
 	public boolean createFile(String userId, String fileName) throws RemoteException {
+		// 在版本目录下新建文件目录
+		File versionPath = new File("Version/" + userId + "/" + fileName);
+		if(!versionPath.exists())
+			versionPath.mkdirs();
 		// 创建该用户文件目录，以其用户名命名
 		File filePath = new File("Users/" + userId);
 		if(!filePath.exists())
