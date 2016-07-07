@@ -57,6 +57,7 @@ public class CompileServiceImpl implements CompileService {
 				input = input.substring(1);
 				break;
 			case '[':	
+				// ºÏ≤È¿®∫≈∆•≈‰
 				boolean isMatch = false;
 				int temp = 0;
 				for (int j = position + 1; j < code.length(); j++) {

@@ -6,6 +6,8 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -101,6 +103,7 @@ public class MainFrame extends JFrame {
 		// 创建窗体
 		mainFrame.setTitle("BF Client");
 		mainFrame.setLayout(null);
+		mainFrame.addWindowListener(new CloseListener());
 		
 		// 滚动条
 		JScrollPane scroller;
@@ -487,6 +490,22 @@ public class MainFrame extends JFrame {
 			versionMenu.setEnabled(false);
 			versionMenu.removeAll();
 			new LoginDialog(mainFrame);
+		}
+	}
+	
+	/**
+	 * 主窗口关闭监听器
+	 */
+	class CloseListener extends WindowAdapter {
+		@Override
+		public void windowClosing(WindowEvent arg0) {
+			if(username != null) {
+				try {
+					RemoteHelper.getInstance().getUserService().logout(username);
+				} catch (RemoteException e1) {
+					e1.printStackTrace();
+				}
+			}
 		}
 	}
 	
